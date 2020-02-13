@@ -19,7 +19,6 @@ class RecipeInteractor: RecipeInteractorInPutProtocol {
                 }
                 if let unwrappedRecipes = recipes {
                     if let recipeHits = unwrappedRecipes.hits {
-                        print(recipeHits)
                         self.presenter?.getLastIndex(index:unwrappedRecipes.to ?? 0)
                         self.presenter?.fetchedRecipeSucsessfully(recipes: recipeHits)
                     }else{
@@ -42,7 +41,6 @@ class RecipeInteractor: RecipeInteractorInPutProtocol {
                 }
                 if let unwrappedRecipes = recipes {
                     if let recipeHits = unwrappedRecipes.hits {
-                        print(recipeHits)
                         self.presenter?.getLastIndex(index:unwrappedRecipes.to ?? 0)
                         self.presenter?.fetchedMoreRecipes(newRecipes: recipeHits)
                     }else{

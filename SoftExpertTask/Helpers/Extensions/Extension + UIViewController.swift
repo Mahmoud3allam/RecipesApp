@@ -16,7 +16,7 @@ extension UIViewController {
                 taggedView.removeFromSuperview()
             }
             let overView = UIView()
-            overView.frame = UIApplication.shared.statusBarFrame
+            overView.frame = (self.view.window?.windowScene?.statusBarManager?.statusBarFrame)!
             overView.backgroundColor = color
             overView.tag = tag
             self.view.addSubview(overView)

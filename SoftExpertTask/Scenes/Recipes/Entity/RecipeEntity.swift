@@ -25,6 +25,8 @@ struct Hits: Codable{
 struct Recipe: Codable {
     let image: String?
     let label: String?
+    let shareAs: String?
     let source: String?
     let healthLabels: [String]?
+    let ingredientLines : [String]?
 }

@@ -9,7 +9,6 @@
 
 import Foundation
 class RecipePresenter: RecipePresenterProtocol, RecipeInteractorOutPutProtocol {
-    
     weak var view: RecipeViewProtocol?
     private let interactor: RecipeInteractorInPutProtocol
     private let router: RecipeRouterProtocol
@@ -26,7 +25,6 @@ class RecipePresenter: RecipePresenterProtocol, RecipeInteractorOutPutProtocol {
         self.router = router
     }
     func viewDidLoad() {
-        print("ViewDidLoad")
     }
     func numberOfRows() -> Int {
         return self.recipesHits.count
@@ -73,7 +71,11 @@ class RecipePresenter: RecipePresenterProtocol, RecipeInteractorOutPutProtocol {
         newRecipes.forEach({self.recipesHits.append($0)})
         view?.reloadTableView()
     }
-    
+    func didSelect(AtIndexPath indexPath: IndexPath) {
+        if let recipe = self.recipesHits[indexPath.item].recipe {
+            router.navigateToDetailsView(withRecipe: recipe)
+        }
+    }
     
     
 }

@@ -7,3 +7,9 @@
 //
 
 import Foundation
+class Constants {
+    static let shared = Constants()
+    let baseUrl = "https://api.edamam.com/search?"
+    let appID =  "f8b7ec9a"
+    let appKey = "790d67ce45d81db824e52092dd39a822"
+}

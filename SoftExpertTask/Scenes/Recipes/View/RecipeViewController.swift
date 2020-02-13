@@ -29,10 +29,15 @@ class RecipeViewController: UITableViewController, RecipeViewProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter.viewDidLoad()
-        self.setupNavigationBarBehaviors()
         self.setupUiBehaviors()
         self.setupSearchController()
         self.registerTableViewCells()
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        self.setupNavigationBarBehaviors()
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        self.title = " "
     }
     private func setupUiBehaviors() {
         self.view.backgroundColor = .black

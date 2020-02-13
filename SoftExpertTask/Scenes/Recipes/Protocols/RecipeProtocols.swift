@@ -24,6 +24,7 @@ protocol RecipePresenterProtocol {
     func numberOfRows() -> Int
     func configure(recipesCell cell:RecipesCellView ,AtIndexPath indexPath : IndexPath)
     func willDisplayLastCell(keyWord:String)
+    func didSelect(AtIndexPath indexPath: IndexPath)
 }
 protocol RecipeInteractorInPutProtocol {
     var presenter: RecipeInteractorOutPutProtocol? {get set}
@@ -40,4 +41,5 @@ protocol RecipesCellView {
     func configureRecipeCell(recipe:Hits)
 }
 protocol RecipeRouterProtocol {
+    func navigateToDetailsView(withRecipe : Recipe)
 }

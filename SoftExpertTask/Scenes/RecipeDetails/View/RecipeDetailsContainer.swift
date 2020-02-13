@@ -36,11 +36,12 @@ class RecipeDetailsContailer : UIView {
         var bu = UIButton()
         bu.translatesAutoresizingMaskIntoConstraints = false
         bu.setTitle("", for: .normal)
-        bu.setTitleColor(.systemBlue, for: .normal)
+        bu.setTitleColor(.white, for: .normal)
         bu.contentVerticalAlignment = .center
         bu.contentHorizontalAlignment = .left
         bu.titleLabel?.font = R.font.proximaNovaABold(size: 20)
         bu.clipsToBounds = true
+        bu.addTarget(self, action: #selector(handlePublisherTapped), for: .touchUpInside)
         bu.titleLabel?.numberOfLines = 2
         return bu
     }()
@@ -50,7 +51,6 @@ class RecipeDetailsContailer : UIView {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.allowsSelection = false
         tableView.separatorStyle = .none
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: NSStringFromClass(UITableViewCell.self))
         return tableView
@@ -70,7 +70,15 @@ class RecipeDetailsContailer : UIView {
             }
         }
     }
-    
+    var ingredients : [String] = [""] {
+        didSet{
+            DispatchQueue.main.async {
+                self.ingredientsTableView.reloadData()
+                self.calculateScrollHeight()
+            }
+        }
+    }
+    var onPublisherTapped:((_ url: String)->())?
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .black
@@ -79,6 +87,9 @@ class RecipeDetailsContailer : UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    override func layoutSubviews() {
+        self.calculateScrollHeight()
+    }
     private func layOutUserInterface(){
         self.addSubViews()
         self.setupScrollView()
@@ -86,6 +97,8 @@ class RecipeDetailsContailer : UIView {
         self.setupRecipeImage()
         self.setupPublisherButton()
         self.setupIngredientsTableView()
+        self.animateRecipeImage()
+        self.animatePublisherButton()
     }
     private func addSubViews(){
         self.addSubview(self.scrollView)
@@ -131,79 +144,33 @@ class RecipeDetailsContailer : UIView {
         ingredientsTableView.topAnchor.constraint(equalTo:  self.recipeImageView.bottomAnchor, constant: 8).isActive = true
         ingredientsTableView.leadingAnchor.constraint(equalTo: self.containerView.leadingAnchor, constant: 32).isActive = true
         ingredientsTableView.bottomAnchor.constraint(equalTo: self.containerView.bottomAnchor, constant: 0).isActive = true
+        self.ingredientsTableView.isScrollEnabled = false
     }
     func calculateScrollHeight(){
-        self.ingredientsTableView.allowsSelection = false
-        self.containerHeight?.isActive = false
-        self.containerHeight?.constant = self.ingredientsTableView.contentSize.height + 200 + 16 + 8
-        self.containerHeight?.isActive = true
-        self.layoutIfNeeded()
-    }
-}
-
-extension RecipeDetailsContailer : UITableViewDataSource , UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
-    }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let ingredientsCell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(UITableViewCell.self), for: indexPath) as? UITableViewCell else {return UITableViewCell()}
-        ingredientsCell.backgroundColor = .clear
-        ingredientsCell.textLabel?.textColor = .white
-        ingredientsCell.textLabel?.text = "ingredient" + "\(indexPath.item)"
-        ingredientsCell.textLabel?.font = R.font.proximaNovaARegular(size: 20)
-        return ingredientsCell
-    }
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 30
-    }
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let ingredientsHeaderView = IngredientsHeaderView()
-        return ingredientsHeaderView
-    }
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.item == 9 {
-            self.calculateScrollHeight()
+        DispatchQueue.main.async {
+            self.containerHeight?.isActive = false
+            self.containerHeight?.constant = self.ingredientsTableView.contentSize.height + 200 + 16 + 8 + 16
+            self.containerHeight?.isActive = true
+            self.layoutIfNeeded()
         }
     }
-    
-}
-
-class IngredientsHeaderView : UIView {
-    let headerLabel : UILabel = {
-       var label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = R.font.proximaNovaBold(size: 25)
-        label.textColor = .white
-        label.textAlignment = .left
-        label.text = "ingredients"
-        return label
-    }()
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.backgroundColor = .clear
-        self.layoutUserInterface()
+    func animateRecipeImage(){
+        self.recipeImageView.transform = CGAffineTransform(translationX: 0, y: -400)
+        UIView.animate(withDuration: 0.8, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.9, options: [.allowUserInteraction , .curveEaseInOut], animations: {
+            self.recipeImageView.transform = .identity
+        }, completion: nil)
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func animatePublisherButton(){
+        UIView.animate(withDuration: 0.0, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.9, options: [.allowUserInteraction , .curveEaseInOut], animations: {
+            self.publisherButton.transform = CGAffineTransform(scaleX: 3, y: 3)
+        }) { (done) in
+            UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.9, options: [.allowUserInteraction , .curveEaseInOut], animations: {
+                self.publisherButton.transform = .identity
+            }, completion: nil)
+        }
     }
-    private func addSubViews(){
-        self.addSubview(self.headerLabel)
-    }
-    private func layoutUserInterface(){
-        self.addSubViews()
-        self.setupHeaderLabel()
-    }
-    
-    private func setupHeaderLabel() {
-        NSLayoutConstraint.activate([
-            self.headerLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 8),
-            self.headerLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0),
-            self.headerLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0),
-            self.headerLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0)
-        ])
+    @objc func handlePublisherTapped(){
+        guard publisherUrl != "" else {return}
+        self.onPublisherTapped?(self.publisherUrl)
     }
 }
